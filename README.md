@@ -1,2 +1,2 @@
 # Disa
-OpenGL scientific rendering engine.
+Vulkan scientific rendering engine.
