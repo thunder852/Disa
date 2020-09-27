@@ -1,5 +1,5 @@
 # Disa
 
-![Disa](/images/Disa_1.svg?raw=true "Disa")
+![Disa](/images/Disa_logo.png?raw=true "Disa")
 
 Vulkan scientific rendering engine.
