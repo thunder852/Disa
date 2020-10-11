@@ -228,15 +228,74 @@ private:
     /**************************************************************************/
 
     void createSurface() 
-    {   
+    {
+        /*
         VkWin32SurfaceCreateInfoKHR createInfo{};
         createInfo.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
         createInfo.hwnd = glfwGetWin32Window(window);
         createInfo.hinstance = GetModuleHandle(nullptr);
 
-        if (glfwCreateWindowSurface(instance, window, nullptr, &surface) != VK_SUCCESS) 
-            throw std::runtime_error("failed to create window surface!");
+        if (vkCreateWin32SurfaceKHR(instance, &createInfo, nullptr, &surface) != VK_SUCCESS) {
+            throw std::runtime_error("Failed to create window surface.");
+        }
+        */
+
+        if (glfwCreateWindowSurface(instance, window, nullptr, &surface) != VK_SUCCESS)
+            throw std::runtime_error("Failed to create window surface.");
+        else std::cout << "Created window surface." << std::endl;
         
+    }
+    
+    /**************************************************************************/
+    /* Instance Creation                                                      */
+    /**************************************************************************/
+    
+    void createInstance()
+    {
+        // Check that validation laters are supported if we are using them.
+        if (enableValidationLayers && !checkValidationLayerSupport())
+            throw std::runtime_error("validation layers requested, but not available!");
+
+        VkApplicationInfo appInfo{};
+        appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
+        appInfo.pApplicationName = "Disa";
+        appInfo.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
+        appInfo.pEngineName = "ClearScreenEngine";
+        appInfo.engineVersion = VK_MAKE_VERSION(1, 0, 0);
+        appInfo.apiVersion = VK_API_VERSION_1_0;
+
+        // Get glfw extensions.
+        auto extensions = getRequiredExtensions();
+
+        if (bCheckExtensions(extensions, extensions.size()))
+        {
+            VkInstanceCreateInfo createInfo{};
+            createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
+            createInfo.pApplicationInfo = &appInfo;
+            createInfo.enabledExtensionCount = static_cast<uint32_t>(extensions.size());;
+            createInfo.ppEnabledExtensionNames = extensions.data();
+
+            VkDebugUtilsMessengerCreateInfoEXT debugCreateInfo;
+            if (enableValidationLayers)
+            {
+                createInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
+                createInfo.ppEnabledLayerNames = validationLayers.data();
+                populateDebugMessengerCreateInfo(debugCreateInfo);
+                createInfo.pNext = static_cast<VkDebugUtilsMessengerCreateInfoEXT*>(&debugCreateInfo);
+            }
+            else
+            {
+                createInfo.enabledLayerCount = 0;
+                createInfo.pNext = nullptr;
+            }
+
+            // Create vulkan instance
+            if (vkCreateInstance(&createInfo, nullptr, &instance) != VK_SUCCESS)
+                throw std::runtime_error("Failed to create vulkan instance.");
+
+        }
+        else
+            throw std::runtime_error("Missing extentions.");
     }
 
     /**************************************************************************/
@@ -291,6 +350,7 @@ private:
 
     QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device) 
     {
+
         QueueFamilyIndices indices;
         
         uint32_t queueFamilyCount = 0;
@@ -761,6 +821,7 @@ private:
 
         if(vkCreateCommandPool(device, &poolInfo, nullptr, &commandPool) != VK_SUCCESS) 
             throw std::runtime_error("Failed to create command pool.");
+        else std::cout << "Created command pool for graphics queue family" << std::endl;
     }
 
     void createCommandBuffers() 
@@ -897,58 +958,7 @@ private:
         glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
         window = glfwCreateWindow(WIDTH, HEIGHT, "Disa", nullptr, nullptr);
     }
-
-    /**
-    * Creates a vulkan instance
-    */
-    void createInstance()
-    {
-        // Check that validation laters are supported if we are using them.
-        if (enableValidationLayers && !checkValidationLayerSupport())
-            throw std::runtime_error("validation layers requested, but not available!");
-
-        VkApplicationInfo appInfo{};
-        appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
-        appInfo.pApplicationName = "Disa";
-        appInfo.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
-        appInfo.pEngineName = "No Engine";
-        appInfo.engineVersion = VK_MAKE_VERSION(1, 0, 0);
-        appInfo.apiVersion = VK_API_VERSION_1_0;
-
-        // Get glfw extensions.
-        auto extensions = getRequiredExtensions();
-
-        if (bCheckExtensions(extensions, extensions.size()))
-        {
-            VkInstanceCreateInfo createInfo{};
-            createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
-            createInfo.pApplicationInfo = &appInfo;
-            createInfo.enabledExtensionCount = static_cast<uint32_t>(extensions.size());;
-            createInfo.ppEnabledExtensionNames = extensions.data();
- 
-            VkDebugUtilsMessengerCreateInfoEXT debugCreateInfo;
-            if(enableValidationLayers)
-            {               
-                createInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
-                createInfo.ppEnabledLayerNames = validationLayers.data();
-                populateDebugMessengerCreateInfo(debugCreateInfo);
-                createInfo.pNext = static_cast<VkDebugUtilsMessengerCreateInfoEXT*>(&debugCreateInfo);
-            }
-            else
-            {
-                createInfo.enabledLayerCount = 0;
-                createInfo.pNext = nullptr;
-            }
-
-            // Create vulkan instance
-            if(vkCreateInstance(&createInfo, nullptr, &instance) != VK_SUCCESS)
-                throw std::runtime_error("Failed to create vulkan instance.");
-           
-       }
-       else
-        throw std::runtime_error("Missing extentions.");
-    }
-
+    
     void initVulkan()
     { 
         createInstance();
@@ -971,7 +981,7 @@ private:
         while (!glfwWindowShouldClose(window))
         {
             glfwPollEvents();   
-            void drawFrame();
+            drawFrame();
         }
 
         vkDeviceWaitIdle(device);
