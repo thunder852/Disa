@@ -1,0 +1,3 @@
+[submodule "source/libVendor/stb"]
+	path = source/libVendor/stb
+	url = https://github.com/nothings/stb.git

@@ -3,3 +3,7 @@
 ################################################################################
 
 /source/build
+/source/out
+/source/.idea
+/source/cmake-build-debug
+/.vs

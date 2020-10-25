@@ -7,7 +7,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 find_package(Vulkan REQUIRED) 
 find_package(glfw3 REQUIRED)
 
-
 include_directories(${Vulkan_INCLUDE_DIRS})
 
 add_subdirectory ("lib/glm")
