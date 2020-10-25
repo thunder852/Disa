@@ -1,3 +1,6 @@
 [submodule "source/libVendor/stb"]
 	path = source/libVendor/stb
 	url = https://github.com/nothings/stb.git
+[submodule "source/libVendor/glm"]
+	path = source/libVendor/glm
+	url = https://github.com/g-truc/glm.git
